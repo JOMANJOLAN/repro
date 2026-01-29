@@ -14,7 +14,7 @@ pub fn generate() {
     let root = env::var("CARGO_MANIFEST_DIR").unwrap();
     let output_dir = root + "/output/board";
     if !fs::exists(&output_dir).unwrap() {
-        fs::create_dir(&output_dir).unwrap();
+        fs::create_dir_all(&output_dir).unwrap();
     }
     let mut buf = String::new();
     let header = format!("P6\n{} {}\n{}\n", w, h, rgb_max);
