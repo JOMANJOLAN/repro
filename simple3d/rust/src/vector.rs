@@ -1,3 +1,4 @@
+use std::array;
 use std::ops::Add;
 use std::ops::Div;
 use std::ops::Mul;
@@ -32,6 +33,46 @@ impl Sqrt for i32 {
     }
 }
 
+pub trait Convert<T> {
+    fn cvt(&self) -> T;
+}
+
+macro_rules! impl_convert_as {
+    ($t:ty, $u:ty) => {
+        impl Convert<$u> for $t {
+            fn cvt(&self) -> $u {
+                *self as $u
+            }
+        }
+    };
+}
+
+impl_convert_as!(f64, f64);
+impl_convert_as!(f64, f32);
+impl_convert_as!(f64, i64);
+impl_convert_as!(f64, i32);
+
+impl_convert_as!(f32, f64);
+impl_convert_as!(f32, f32);
+impl_convert_as!(f32, i64);
+impl_convert_as!(f32, i32);
+
+impl_convert_as!(i64, f64);
+impl_convert_as!(i64, f32);
+impl_convert_as!(i64, i64);
+impl_convert_as!(i64, i32);
+
+impl_convert_as!(i32, f64);
+impl_convert_as!(i32, f32);
+impl_convert_as!(i32, i64);
+impl_convert_as!(i32, i32);
+
+impl<const N: usize, T: Convert<U>, U> Convert<[U; N]> for [T; N] {
+    fn cvt(&self) -> [U; N] {
+        array::from_fn(|i| self[i].cvt())
+    }
+}
+
 pub trait Vector<T> {
     fn neg(&self) -> Self;
 
@@ -40,10 +81,10 @@ pub trait Vector<T> {
     fn mulv(&self, rhs: &Self) -> Self;
     fn divv(&self, rhs: &Self) -> Self;
 
-    fn addf(&self, rhs: T) -> Self;
-    fn subf(&self, rhs: T) -> Self;
-    fn mulf(&self, rhs: T) -> Self;
-    fn divf(&self, rhs: T) -> Self;
+    fn adds(&self, rhs: T) -> Self;
+    fn subs(&self, rhs: T) -> Self;
+    fn muls(&self, rhs: T) -> Self;
+    fn divs(&self, rhs: T) -> Self;
 
     fn dot(&self, rhs: &Self) -> T;
     fn magnitude(&self) -> T;
@@ -63,89 +104,54 @@ where
         + Div<T, Output = T>,
 {
     fn neg(&self) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = -self[i];
-        }
-        ret
+        array::from_fn(|i| -self[i])
     }
 
     fn addv(&self, rhs: &Self) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] + rhs[i];
-        }
-        ret
+        array::from_fn(|i| self[i] + rhs[i])
     }
 
     fn subv(&self, rhs: &Self) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] - rhs[i];
-        }
-        ret
+        array::from_fn(|i| self[i] - rhs[i])
     }
 
     fn mulv(&self, rhs: &Self) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] * rhs[i];
-        }
-        ret
+        array::from_fn(|i| self[i] * rhs[i])
     }
 
     fn divv(&self, rhs: &Self) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] / rhs[i];
-        }
-        ret
+        array::from_fn(|i| self[i] / rhs[i])
     }
 
-    fn addf(&self, rhs: T) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] + rhs;
-        }
-        ret
+    fn adds(&self, rhs: T) -> Self {
+        array::from_fn(|i| self[i] + rhs)
     }
 
-    fn subf(&self, rhs: T) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] - rhs;
-        }
-        ret
+    fn subs(&self, rhs: T) -> Self {
+        array::from_fn(|i| self[i] - rhs)
     }
 
-    fn mulf(&self, rhs: T) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] * rhs;
-        }
-        ret
+    fn muls(&self, rhs: T) -> Self {
+        array::from_fn(|i| self[i] * rhs)
     }
 
-    fn divf(&self, rhs: T) -> Self {
-        let mut ret = [T::default(); N];
-        for i in 0..N {
-            ret[i] = self[i] / rhs;
-        }
-        ret
+    fn divs(&self, rhs: T) -> Self {
+        array::from_fn(|i| self[i] / rhs)
     }
 
     fn dot(&self, rhs: &Self) -> T {
-        let mut ret = T::default();
+        let mut sum = T::default();
         for i in 0..N {
-            ret = self[i] * rhs[i];
+            sum = sum + self[i] * rhs[i];
         }
-        ret
+        sum
     }
 
     fn magnitude(&self) -> T {
         let mut sum = T::default();
         for i in 0..N {
-            sum = sum + self[i] * self[i];
+            let n = self[i];
+            sum = sum + n * n;
         }
         sum.sqrt()
     }
@@ -153,14 +159,15 @@ where
     fn distance(&self, rhs: &Self) -> T {
         let mut sum = T::default();
         for i in 0..N {
-            sum = sum + (self[i] - rhs[i]) * (self[i] - rhs[i]);
+            let n = (self[i] - rhs[i]) * (self[i] - rhs[i]);
+            sum = sum + n * n;
         }
         sum.sqrt()
     }
 
     fn normalized(&self) -> Self {
         let m = self.magnitude();
-        self.divf(m)
+        self.divs(m)
     }
 }
 

@@ -178,31 +178,19 @@ impl Transform {
         }
     }
 
-    /// # Panic
-    /// Panics if `dst.len()` is less than `vs.len()`.
-    pub fn transform_dst(self, vs: &[Vec3f64], dst: &mut [Vec3f64]) {
-        assert!(vs.len() <= dst.len());
+    pub fn transform(self, vs: &mut [Vec3f64]) {
         let t = self.t;
-        for i in 0..3 {
-            for j in 0..vs.len() {
+        let mut buf = [0.; 3];
+        for i in 0..vs.len() {
+            for j in 0..3 {
                 for k in 0..3 {
-                    dst[j][i] += t[i][k] * vs[j][k];
+                    buf[j] += t[j][k] * vs[i][k];
                 }
-                dst[j][i] += t[i][3];
+                buf[j] += t[j][3];
             }
+            vs[i] = buf;
+            buf.fill(0.);
         }
-    }
-
-    pub fn transform_vec(self, vs: &[Vec3f64]) -> Vec<Vec3f64> {
-        let mut ret = vec![[0.; 3]; vs.len()];
-        self.transform_dst(vs, &mut ret);
-        ret
-    }
-
-    pub fn transform_con<const N: usize>(self, vs: &[Vec3f64; N]) -> [Vec3f64; N] {
-        let mut ret = [[0.; 3]; N];
-        self.transform_dst(vs, &mut ret);
-        ret
     }
 }
 
