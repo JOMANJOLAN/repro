@@ -1,16 +1,16 @@
 use crate::coordsys::CoordSys;
 use crate::transform as tsf;
 use crate::transform::Transform;
-use crate::vector::{Vec3f64, Vector};
+use crate::vector::{V3f64, Vector};
 
 pub struct Object {
     cs: CoordSys,
-    vs: Vec<Vec3f64>,
+    vs: Vec<V3f64>,
     es: Vec<Vec<usize>>,
 }
 
 impl Object {
-    pub fn new(vs: Vec<Vec3f64>, es: Vec<Vec<usize>>) -> Self {
+    pub fn new(vs: Vec<V3f64>, es: Vec<Vec<usize>>) -> Self {
         Self {
             cs: CoordSys::global(),
             vs,
@@ -22,7 +22,7 @@ impl Object {
         &self.cs
     }
 
-    pub fn vertices(&self) -> &[Vec3f64] {
+    pub fn vertices(&self) -> &[V3f64] {
         &self.vs
     }
 
@@ -30,14 +30,14 @@ impl Object {
         &self.es
     }
 
-    pub fn translate_local_tsf(&mut self, v: Vec3f64) -> Transform {
+    pub fn translate_local_tsf(&mut self, v: V3f64) -> Transform {
         let [x, y, z] = v;
         Transform::new(tsf::translate(self.cs.x().muls(x)))
             .translate(self.cs.y().muls(y))
             .translate(self.cs.z().muls(z))
     }
 
-    pub fn translate_local(&mut self, v: Vec3f64) {
+    pub fn translate_local(&mut self, v: V3f64) {
         let ts = self.translate_local_tsf(v);
         self.transform(&ts);
     }
@@ -74,7 +74,7 @@ impl Object {
         ts.transform(&mut self.vs);
     }
 
-    pub fn lines(&self) -> impl Iterator<Item = [Vec3f64; 2]> {
+    pub fn lines(&self) -> impl Iterator<Item = [V3f64; 2]> {
         self.es
             .iter()
             .map(|e| (0..e.len()).map(|i| (e[i], e[(i + 1) % e.len()])))

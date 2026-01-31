@@ -1,17 +1,17 @@
-use crate::vector::{Convert, Vec2f64, Vec2i32, Vector};
+use crate::vector::{Convert, V2f64, V2i32, Vector};
 
 #[derive(Clone, Copy)]
 pub struct Point {
-    pub p: Vec2i32,
+    pub p: V2i32,
     pub d: usize,
 }
 
 impl Point {
-    pub fn new(p: Vec2i32, d: usize) -> Self {
+    pub fn new(p: V2i32, d: usize) -> Self {
         Self { p, d }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = Vec2i32> {
+    pub fn iter(&self) -> impl Iterator<Item = V2i32> {
         let Self { p, d } = *self;
         let d = d as i32;
         let r = d / 2;
@@ -27,27 +27,21 @@ impl Point {
 
 #[derive(Clone, Copy)]
 pub struct Line {
-    pub p1: Vec2i32,
-    pub p2: Vec2i32,
+    pub p1: V2i32,
+    pub p2: V2i32,
 }
 
 impl Line {
-    pub fn new(p1: Vec2i32, p2: Vec2i32) -> Self {
+    pub fn new(p1: V2i32, p2: V2i32) -> Self {
         Self { p1, p2 }
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = Vec2i32> {
+    pub fn iter(&self) -> impl Iterator<Item = V2i32> {
         let Self { p1, p2 } = *self;
         DrawLine::new(p1, p2, i32::MIN, i32::MAX, i32::MIN, i32::MAX)
     }
 
-    pub fn draw(
-        &self,
-        xmin: i32,
-        xmax: i32,
-        ymin: i32,
-        ymax: i32,
-    ) -> impl Iterator<Item = Vec2i32> {
+    pub fn draw(&self, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> impl Iterator<Item = V2i32> {
         let Self { p1, p2 } = *self;
         DrawLine::new(p1, p2, xmin, xmax, ymin, ymax)
     }
@@ -55,9 +49,9 @@ impl Line {
 
 #[derive(Default)]
 pub struct DrawLine {
-    p1: Vec2i32,
-    p2: Vec2i32,
-    p: Option<Vec2i32>,
+    p1: V2i32,
+    p2: V2i32,
+    p: Option<V2i32>,
     dx: i32,
     dy: i32,
     sx: i32,
@@ -66,7 +60,7 @@ pub struct DrawLine {
 }
 
 impl DrawLine {
-    fn line_code(p: Vec2i32, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> u8 {
+    fn line_code(p: V2i32, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> u8 {
         let [x, y] = p;
         let mut code = 0;
         if x < xmin {
@@ -83,12 +77,12 @@ impl DrawLine {
     }
 
     fn cut_line(
-        [mut p1, mut p2]: [Vec2i32; 2],
+        [mut p1, mut p2]: [V2i32; 2],
         xmin: i32,
         xmax: i32,
         ymin: i32,
         ymax: i32,
-    ) -> Option<[Vec2i32; 2]> {
+    ) -> Option<[V2i32; 2]> {
         let mut code1 = Self::line_code(p1, xmin, xmax, ymin, ymax);
         let mut code2 = Self::line_code(p2, xmin, xmax, ymin, ymax);
         if code1 | code2 == 0 {
@@ -98,8 +92,8 @@ impl DrawLine {
             return None;
         }
         for _ in 0..2 {
-            let [x1, y1] = Convert::<Vec2f64>::cvt(&p1);
-            let [x2, y2] = Convert::<Vec2f64>::cvt(&p2);
+            let [x1, y1] = Convert::<V2f64>::cvt(&p1);
+            let [x2, y2] = Convert::<V2f64>::cvt(&p2);
             if code1 & 0b_0001 != 0 {
                 p1[0] = xmin;
                 if x2 != x1 {
@@ -128,7 +122,7 @@ impl DrawLine {
         Some([p1, p2])
     }
 
-    pub fn new(p1: Vec2i32, p2: Vec2i32, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> Self {
+    pub fn new(p1: V2i32, p2: V2i32, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> Self {
         let Some([p1, p2]) = Self::cut_line([p1, p2], xmin, xmax, ymin, ymax) else {
             return Self {
                 p: None,
@@ -151,17 +145,17 @@ impl DrawLine {
         }
     }
 
-    pub fn start(&self) -> Vec2i32 {
+    pub fn start(&self) -> V2i32 {
         self.p1
     }
 
-    pub fn end(&self) -> Vec2i32 {
+    pub fn end(&self) -> V2i32 {
         self.p2
     }
 }
 
 impl Iterator for DrawLine {
-    type Item = Vec2i32;
+    type Item = V2i32;
 
     fn next(&mut self) -> Option<Self::Item> {
         let Self {
@@ -214,7 +208,7 @@ impl Canvas {
         self.vec.fill(color);
     }
 
-    pub fn dot(&mut self, p: Vec2i32, radius: usize, rgb: [u8; 3]) {
+    pub fn dot(&mut self, p: V2i32, radius: usize, rgb: [u8; 3]) {
         let Self { w, h, .. } = *self;
         for p in Point::new(p, radius).iter() {
             let [x, y] = p;
@@ -226,7 +220,7 @@ impl Canvas {
         }
     }
 
-    pub fn line(&mut self, p1: Vec2i32, p2: Vec2i32, width: usize, rgb: [u8; 3]) {
+    pub fn line(&mut self, p1: V2i32, p2: V2i32, width: usize, rgb: [u8; 3]) {
         let Self { w, h, .. } = *self;
         let bound = width as i32 / 2 + 1;
         let xmin = -bound;

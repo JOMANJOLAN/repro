@@ -1,7 +1,7 @@
-use crate::vector::{Vec3f64, Vec4f64, Vector};
+use crate::vector::{V3f64, V4f64, Vector};
 
 /// # Transform Matrix Multiplication
-fn mul(m1: &[Vec4f64; 4], m2: &[Vec4f64; 4]) -> [Vec4f64; 4] {
+fn mul(m1: &[V4f64; 4], m2: &[V4f64; 4]) -> [V4f64; 4] {
     let mut n = [[0.; 4]; 4];
     for i in 0..4 {
         for j in 0..4 {
@@ -13,7 +13,7 @@ fn mul(m1: &[Vec4f64; 4], m2: &[Vec4f64; 4]) -> [Vec4f64; 4] {
     n
 }
 
-pub fn e() -> [Vec4f64; 4] {
+pub fn e() -> [V4f64; 4] {
     [
         [1., 0., 0., 0.],
         [0., 1., 0., 0.],
@@ -22,7 +22,7 @@ pub fn e() -> [Vec4f64; 4] {
     ]
 }
 
-pub fn translate([x, y, z]: Vec3f64) -> [Vec4f64; 4] {
+pub fn translate([x, y, z]: V3f64) -> [V4f64; 4] {
     [
         [1., 0., 0., x],
         [0., 1., 0., y],
@@ -31,7 +31,7 @@ pub fn translate([x, y, z]: Vec3f64) -> [Vec4f64; 4] {
     ]
 }
 
-pub fn zoom([x, y, z]: Vec3f64) -> [Vec4f64; 4] {
+pub fn zoom([x, y, z]: V3f64) -> [V4f64; 4] {
     [
         [x, 0., 0., 0.],
         [0., y, 0., 0.],
@@ -40,7 +40,7 @@ pub fn zoom([x, y, z]: Vec3f64) -> [Vec4f64; 4] {
     ]
 }
 
-pub fn rx_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
+pub fn rx_cossin(cos: f64, sin: f64) -> [V4f64; 4] {
     [
         [1., 0., 0., 0.],
         [0., cos, -sin, 0.],
@@ -49,7 +49,7 @@ pub fn rx_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
     ]
 }
 
-pub fn ry_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
+pub fn ry_cossin(cos: f64, sin: f64) -> [V4f64; 4] {
     [
         [cos, 0., sin, 0.],
         [0., 1., 0., 0.],
@@ -58,7 +58,7 @@ pub fn ry_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
     ]
 }
 
-pub fn rz_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
+pub fn rz_cossin(cos: f64, sin: f64) -> [V4f64; 4] {
     [
         [cos, -sin, 0., 0.],
         [sin, cos, 0., 0.],
@@ -67,19 +67,19 @@ pub fn rz_cossin(cos: f64, sin: f64) -> [Vec4f64; 4] {
     ]
 }
 
-pub fn rx_rad(rad: f64) -> [Vec4f64; 4] {
+pub fn rx_rad(rad: f64) -> [V4f64; 4] {
     let cos = rad.cos();
     let sin = rad.sin();
     rx_cossin(cos, sin)
 }
 
-pub fn ry_rad(rad: f64) -> [Vec4f64; 4] {
+pub fn ry_rad(rad: f64) -> [V4f64; 4] {
     let cos = rad.cos();
     let sin = rad.sin();
     ry_cossin(cos, sin)
 }
 
-pub fn rz_rad(rad: f64) -> [Vec4f64; 4] {
+pub fn rz_rad(rad: f64) -> [V4f64; 4] {
     let cos = rad.cos();
     let sin = rad.sin();
     rz_cossin(cos, sin)
@@ -87,7 +87,7 @@ pub fn rz_rad(rad: f64) -> [Vec4f64; 4] {
 
 /// # Params
 /// `o` means origin, `d` means direction
-pub fn rotate(o: Vec3f64, d: Vec3f64, rad: f64) -> [Vec4f64; 4] {
+pub fn rotate(o: V3f64, d: V3f64, rad: f64) -> [V4f64; 4] {
     let [x, y, z] = d;
     let cos_a = z / [y, z].magnitude();
     let sin_a = y / [y, z].magnitude();
@@ -112,11 +112,11 @@ pub fn rotate(o: Vec3f64, d: Vec3f64, rad: f64) -> [Vec4f64; 4] {
 
 #[derive(Clone, Copy)]
 pub struct Transform {
-    t: [Vec4f64; 4],
+    t: [V4f64; 4],
 }
 
 impl Transform {
-    pub fn new(t: [Vec4f64; 4]) -> Self {
+    pub fn new(t: [V4f64; 4]) -> Self {
         Self { t }
     }
 
@@ -124,13 +124,13 @@ impl Transform {
         Self { t: e() }
     }
 
-    pub fn zoom(self, v: Vec3f64) -> Self {
+    pub fn zoom(self, v: V3f64) -> Self {
         Self {
             t: mul(&zoom(v), &self.t),
         }
     }
 
-    pub fn translate(self, v: Vec3f64) -> Self {
+    pub fn translate(self, v: V3f64) -> Self {
         Self {
             t: mul(&translate(v), &self.t),
         }
@@ -172,13 +172,13 @@ impl Transform {
         }
     }
 
-    pub fn rotate(self, o: Vec3f64, d: Vec3f64, rad: f64) -> Self {
+    pub fn rotate(self, o: V3f64, d: V3f64, rad: f64) -> Self {
         Self {
             t: mul(&rotate(o, d, rad), &self.t),
         }
     }
 
-    pub fn transform(self, vs: &mut [Vec3f64]) {
+    pub fn transform(self, vs: &mut [V3f64]) {
         let t = self.t;
         let mut buf = [0.; 3];
         for i in 0..vs.len() {

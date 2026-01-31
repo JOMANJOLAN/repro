@@ -183,11 +183,11 @@ impl Vector3 for [f64; 3] {
     }
 }
 
-pub type Vec4f64 = [f64; 4];
-pub type Vec3f64 = [f64; 3];
-pub type Vec2f64 = [f64; 2];
+pub type V4f64 = [f64; 4];
+pub type V3f64 = [f64; 3];
+pub type V2f64 = [f64; 2];
 
-pub type Vec3i32 = [i32; 3];
-pub type Vec2i32 = [i32; 2];
+pub type V3i32 = [i32; 3];
+pub type V2i32 = [i32; 2];
 
-pub type Vec3usize = [usize; 3];
+pub type V3usize = [usize; 3];

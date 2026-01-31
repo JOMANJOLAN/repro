@@ -1,6 +1,6 @@
-use crate::vector::{Vec2f64, Vec3f64, Vector};
+use crate::vector::{V2f64, V3f64, Vector};
 
-pub fn persp(p: Vec3f64) -> Vec2f64 {
+pub fn persp(p: V3f64) -> V2f64 {
     let [x, y, mut z] = p;
     if z.abs() < 1e-6 {
         // 0.001
@@ -9,7 +9,7 @@ pub fn persp(p: Vec3f64) -> Vec2f64 {
     [x, y].divs(z)
 }
 
-pub fn screen(p: Vec2f64, w: usize, h: usize) -> Vec2f64 {
+pub fn screen(p: V2f64, w: usize, h: usize) -> V2f64 {
     assert!(w != 0);
     assert!(h != 0);
     let w = w as f64;
