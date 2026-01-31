@@ -49,7 +49,7 @@ impl Line {
 
 #[derive(Default)]
 pub struct DrawLine {
-    p1: V2i32,
+    _p1: V2i32,
     p2: V2i32,
     p: Option<V2i32>,
     dx: i32,
@@ -60,18 +60,23 @@ pub struct DrawLine {
 }
 
 impl DrawLine {
+    const XMIN_MASK: u8 = 0b_0001;
+    const XMAX_MASK: u8 = 0b_0010;
+    const YMIN_MASK: u8 = 0b_0100;
+    const YMAX_MASK: u8 = 0b_1000;
+
     fn line_code(p: V2i32, xmin: i32, xmax: i32, ymin: i32, ymax: i32) -> u8 {
         let [x, y] = p;
         let mut code = 0;
         if x < xmin {
-            code |= 0b_0001;
+            code |= Self::XMIN_MASK;
         } else if xmax < x {
-            code |= 0b_0010;
+            code |= Self::XMAX_MASK;
         }
         if y < ymin {
-            code |= 0b_0100;
+            code |= Self::YMIN_MASK;
         } else if ymax < y {
-            code |= 0b_1000;
+            code |= Self::YMAX_MASK;
         }
         code
     }
@@ -92,32 +97,36 @@ impl DrawLine {
             return None;
         }
         for _ in 0..2 {
-            let [x1, y1] = Convert::<V2f64>::cvt(&p1);
-            let [x2, y2] = Convert::<V2f64>::cvt(&p2);
-            if code1 & 0b_0001 != 0 {
-                p1[0] = xmin;
-                if x2 != x1 {
-                    p1[1] = (y1 + (y2 - y1) * (xmin as f64 - x1) / (x2 - x1)) as i32;
-                }
-            } else if code1 & 0b_0010 != 0 {
-                p1[0] = xmax;
-                if x2 != x1 {
-                    p1[1] = (y1 + (y2 - y1) * (xmax as f64 - x1) / (x2 - x1)) as i32;
-                }
-            }
-            if code1 & 0b_0100 != 0 {
-                p1[1] = ymin;
-                if y2 != y1 {
-                    p1[0] = (x1 + (x2 - x1) * (ymin as f64 - y1) / (y2 - y1)) as i32;
-                }
-            } else if code1 & 0b_1000 != 0 {
-                p1[1] = ymax;
-                if y2 != y1 {
-                    p1[0] = (x1 + (x2 - x1) * (ymax as f64 - y1) / (y2 - y1)) as i32;
-                }
-            }
             (p1, p2) = (p2, p1);
             (code1, code2) = (code2, code1);
+            if code1 == 0 {
+                continue;
+            }
+            let [x1, y1] = Convert::<V2f64>::cvt(&p1);
+            let [x2, y2] = Convert::<V2f64>::cvt(&p2);
+            let [x, y] = &mut p1;
+            if code1 & Self::XMIN_MASK != 0 {
+                *x = xmin;
+                if x2 != x1 {
+                    *y = (y1 + (y2 - y1) * (xmin as f64 - x1) / (x2 - x1)) as i32;
+                }
+            } else if code1 & Self::XMAX_MASK != 0 {
+                *x = xmax;
+                if x2 != x1 {
+                    *y = (y1 + (y2 - y1) * (xmax as f64 - x1) / (x2 - x1)) as i32;
+                }
+            }
+            if code1 & Self::YMIN_MASK != 0 {
+                *y = ymin;
+                if y2 != y1 {
+                    *x = (x1 + (x2 - x1) * (ymin as f64 - y1) / (y2 - y1)) as i32;
+                }
+            } else if code1 & Self::YMAX_MASK != 0 {
+                *y = ymax;
+                if y2 != y1 {
+                    *x = (x1 + (x2 - x1) * (ymax as f64 - y1) / (y2 - y1)) as i32;
+                }
+            }
         }
         Some([p1, p2])
     }
@@ -134,7 +143,7 @@ impl DrawLine {
         let sx = if p2[0] > p1[0] { 1 } else { -1 };
         let sy = if p2[1] > p1[1] { 1 } else { -1 };
         Self {
-            p1,
+            _p1: p1,
             p2,
             p: Some(p1),
             dx,
@@ -144,14 +153,6 @@ impl DrawLine {
             e: dx + dy,
         }
     }
-
-    pub fn start(&self) -> V2i32 {
-        self.p1
-    }
-
-    pub fn end(&self) -> V2i32 {
-        self.p2
-    }
 }
 
 impl Iterator for DrawLine {
@@ -159,7 +160,7 @@ impl Iterator for DrawLine {
 
     fn next(&mut self) -> Option<Self::Item> {
         let Self {
-            p1: _,
+            _p1,
             p2,
             p,
             dx,
