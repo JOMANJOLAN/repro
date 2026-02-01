@@ -1,70 +1,39 @@
-# Reproductions of Micro Projects
+# 微型项目复现集
 
-## 📚 Introduction
-This repository contains reproductions of various micro projects aimed at **hands-on learning** and **practical skill development**.
+## 📚 项目介绍
+本仓库包含各类微型项目的复现实现，旨在通过**动手实践**促进**实用技能发展**
 
-## 🎯 Purpose
-* **Practice & Consolidation**: Strengthen understanding of language fundamentals
-  * Standard library usage
-  * Core language features
-  * Best practices and patterns
-* **Language Exploration**: Experiment with new programming languages
-* **Skill Expansion**: Learn and apply new techniques through practical implementation
+## 🎯 项目目标
+* **实践与巩固**：强化对语言核心概念的理解
+  * 标准库的实际运用
+  * 核心语言特性掌握
+  * 最佳实践与模式学习
+* **语言探索**：通过实践体验不同编程语言特性
+* **技能拓展**：在实际实现中学习和应用新技术
 
-## 📁 Projects
+## 📁 项目列表
 
-### 🎮 SIMPLE3D - Basic 3D Cube Renderer
-* **Date**: 2026/01/23
-* **Languages**: HTML, JavaScript
-* **Tools**: Firefox
-* **Description**: A **basic 3D graphics rendering engine** implemented with pure JavaScript and HTML5 Canvas, demonstrating the complete rendering pipeline from 3D space to 2D screen
-* **Features**:
-  - **Wireframe Rendering**: Display cube edges and vertices
-  - **Perspective Projection**: Simulates 3D effects as seen by the human eye
-  - **Dynamic Rotation**: Supports continuous Y-axis rotation animation
-  - **Coordinate Transformation**: Implements a complete 3D graphics rendering pipeline
-* **Learning Focus**:
-  - 3D coordinate systems and transformation matrices
-  - Model-View-Projection transformation chain
-  - Simple animation loop implementation
-  - Canvas 2D drawing API usage
-* **Key Implementation**:
-  - Perspective projection (`z` coordinate division)
-  - 3D rotation around Y-axis
-  - Coordinate mapping from normalized [-1, 1] to screen coordinates
-  - Dual animation loop support (both `setTimeout` and `requestAnimationFrame`)
+### 🎮 SIMPLE3D 基础3D立方体渲染器
+* **使用语言**：HTML、JavaScript、Rust
+* **开发工具**：Firefox
+* **项目描述**：
+  * 使用纯JavaScript和HTML5 Canvas实现了基础3D图形渲染
+  * 使用Rust标准库实现基础3D图形渲染
 
-### 🎨 PPMDEMO - Procedural Shader Animation
-* **Date**: 2026/01/25
-* **Languages**: C, C++, Rust
-* **Tools**: FFmpeg, MPV
-* **Description**: A procedural shader animation rendered to PPM image sequences, exploring:
-  * GPU shader algorithms on CPU
-  * Multi-threaded rendering optimization
-  * Cross-language implementation comparison
-  * Media encoding pipeline
-* **Learning Journey**:
-  - Technical migration from GLSL shaders to CPU implementation
-  - Rust multi-threading performance optimization practice
-  - Cross-language algorithm implementation comparison
-  - Image sequence to video encoding processing
-* **Key Features**:
-  - Fractal/procedural texture generation
-  - Mathematical visualization of vector operations
-  - Multi-threaded frame rendering
-  - PPM image format output
+### 🎨 PPMDEMO 程序化着色器动画
+* **使用语言**：C、C++、Rust
+* **工具链**：FFmpeg、MPV
+* **项目描述**
+  * 使用C/C++渲染为PPM图像序列的程序化着色器动画
+  * 使用Rust实现多线程加速渲染
 
-## 🚀 Getting Started
-Each project contains its own documentation and build instructions. Clone the repository and explore individual project directories for specific details.
+## 🚀 快速开始
+每个项目都包含独立的说明文档和构建指南。克隆本仓库后，可进入各项目目录查看具体细节。
 
-## 📈 Learning Journey
-These projects represent incremental steps in understanding:
-- **Graphics Programming**: From basic 3D concepts to shader algorithms
-- **Performance Optimization**: Single-threaded to multi-threaded implementations
-- **Language Comparison**: Solving the same problem across different programming paradigms
-- **Tool Integration**: Using specialized tools (FFmpeg, MPV) for media processing
-- **Mathematical Visualization**: Translating mathematical formulas into visual effects
-
----
-
-*"The best way to learn is by doing. These projects are my hands-on laboratory for exploration and growth."*
+## 📈 学习历程
+这些项目记录了我在以下领域的渐进式探索：
+- **图形编程**：从基础3D概念到着色器算法
+- **性能优化**：从单线程到多线程实现的演进
+- **语言对比**：在不同编程范式下解决同一问题
+- **工具集成**：FFmpeg、MPV等专业工具在媒体处理中的应用
+- **数学可视化**：将数学公式转化为可视化效果
